@@ -12,7 +12,7 @@ Databases often contain massive amounts of data and support thousands
 of simultaneous users, and thus must be managed with sophisticated software
 tools.
 
-## Relational Database Management Systems
+## Key Vocabulary
 
 - **Data** is information that can be represented in many formats including
   numeric, textual, visual, or audio.
@@ -22,12 +22,12 @@ tools.
   performance, transactions, multi-user access, and recovery.
 - A **relational database management system** or **RDBMS** stores data in
   tables, columns and rows.
-  - A table holds information about objects of a similar type.
+  - A **table** holds information about objects of a similar type.
   - Each column within a table has a unique name. A column may also be
-    referred to as a field or attribute.
+    referred to as a **field** or **attribute**.
   - All values within a column have the same type and are atomic.
   - A row within a table represents a unique object or entity. A row may also be
-    referred to as a record.
+    referred to as a **record**.
   - Each table must define a unique identifier, called a **primary key**.
     - The primary key consists of one or more columns.
     - Two rows can't contain the same set of values in their primary key
@@ -57,13 +57,13 @@ relationship between owner and pet. We'll assume each pet has one owner, while
 an owner may own many pets. Thus, our `owner` and `pet` tables need columns to
 store the following data:
 
-- **owner**: unique identifier, first name, last name, and phone number.
-- **pet**: unique identifier, name, species (cat, dog, etc), breed, age, and
+- _owner_: unique identifier, first name, last name, and phone number.
+- _pet_: unique identifier, name, species (cat, dog, etc), breed, age, and
   owner's unique identifier.
 
 An **entity-relationship model** of `owner` and `pet` is shown below. The
 relationship connecting pet and owner indicates each pet has exactly one owner
-( indicated by single line | ), while an owner may have many pets (indicated by
+( indicated by a single line | ), while an owner may have many pets (indicated by
 three forked lines, also called "crows feet"). This type of relationship is called
 "one-to-many".
 
@@ -90,36 +90,103 @@ is owned by the owner with id 3, i.e. Dana Abcer. **Foreign key** references are
 what makes relational databases so powerful in terms of modeling real-world
 entities and their complex relationships.
 
-Imagine how we might connect the idea of a table in SQL to a class in Java, and
-a record within a table to an instance of a class. For the `owner` table, the
-Java representation would be an `Owner` class such as the following:
+Imagine how we might connect the idea of a table in SQL to a class in Python,
+and a record within a table to an instance of a class. For the `owner` table, the
+Python representation would be an `Owner` class such as the following:
 
-```java
-public class Owner {
-    private int id;
-    private String firstName;
-    private String lastName;
-    private String phone;
-}
+```py
+class Owner:
+    def __init__(self, first_name, last_name, phone):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.phone = phone
+        self._pets = []
+    
+    @property
+    def first_name(self):
+        return self._first_name
+    
+    @property
+    def last_name(self):
+        return self._last_name
+    
+    @property
+    def phone(self):
+        self._phone
+    
+    @phone.setter
+    def phone(self, value):
+        self._phone = value
+    
+    @property
+    def pets(self):
+        return self._pets
+    
+    def add_pet(self, pet):
+        if isinstance(pet, Pet):
+            self._pets.append(pet)
+            pet.owner = self
+        else:    
+            raise TypeError("Pet must be an instance of Pet class")                        
 ```
 
-The Java representation of the `pet` table would be the `Pet` class shown below.
-Note that the owner is represented as a reference to an instance of the `Owner`
-class, rather than an integer identifier as stored in the `pet` database table:
+Notice above how we reference the `Pet` class to show that a list of pets (to
+show an owner can have many pets) belongs to an `Owner`. Let's look at the
+Python representation now of the `pet` table. The `pet` table would be the `Pet`
+class shown below. Note that the owner is represented as a reference to an
+instance of the `Owner` class, rather than an integer identifier as stored in
+the `pet` database table:
 
-```java
-public class Pet {
-    private int id;
-    private String name;
-    private String species;
-    private String breed;
-    private int age;
-    private Owner owner;
-}
+```py
+class Pet:
+    def __init__(self, name, species, breed, age):
+        self.name = name
+        self.species = species
+        self.breed = breed
+        self.age = age
+        self._owner = None
+    
+    @property
+    def name(self):
+        return self._name
+    
+    @name.setter
+    def name(self, value):
+        if isinstance(value, str):
+            self._name = value
+        else:
+            raise TypeError("Name must be a string")
+    
+    @property
+    def species(self):
+        return self._species
+    
+    @property
+    def breed(self):
+        return self._breed
+        
+    @property
+    def age(self):
+        return self._age
+    
+    @age.setter
+    def age(self, value):
+        if isinstance(value, int):
+            self._age = value
+        else:
+            raise TypeError("Age must be an integer")
+    
+    @property
+    def owner(self):
+        return self._owner
+    
+    @owner.setter
+    def owner(self, value):
+        if isinstance(value, Owner):
+            self._owner = value
+        else:
+            raise TypeError("Owner must be an instance of Owner class")                                                            
 ```
-
-In a subsequent lesson we will see how to automatically map Java classes and
-database tables, which is called **Object-Relational Mapping** or **ORM**.
 
 ## Structured Query Language
 
